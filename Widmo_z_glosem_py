@@ -2,6 +2,7 @@ import pyaudio
 import wave
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 from scipy.signal import find_peaks
 from scipy import signal
  
@@ -74,18 +75,23 @@ plt.xlabel('Czas (w s)')
 plt.xlim(0, time)
 plt.title('Próbka którą nagrałem')
 
-ymin, ymax = plt.ylim()
+# ymin, ymax = plt.ylim()
 
 
 #Narazie wyszukuje Ymin i Ymax
-s = 'Maksymalne (Y) wystąpiło dla wartości = ' + str(ymax) + '\n' + \
-    'Minimalne (Y) wystąpiło dla wartości =  ' + str(ymin) + ' '
-d = np.interp(ymax, times, audio_array)
+# s = 'Maksymalne (Y) wystąpiło dla wartości = ' + str(ymax) + '\n' + \
+#    'Minimalne (Y) wystąpiło dla wartości =  ' + str(ymin) + ' '
+
+Ymax=np.max(audio_array)
+DlaX = np.interp(Ymax, audio_array, times)
+
+# log=10*math.log10(Ymax)
+print('Maksymalna wartość dla (Y) to: '+ str(Ymax))
 
 
-print(s)
-print('Dla x równego '+ str(d) ) 
-
+# print(s)
+print('Dla x równego '+ str(DlaX) ) 
+# print log
 
 
 plt.show()
