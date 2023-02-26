@@ -83,14 +83,16 @@ plt.title('Próbka którą nagrałem')
 #    'Minimalne (Y) wystąpiło dla wartości =  ' + str(ymin) + ' '
 
 Ymax=np.max(audio_array)
-DlaX = np.interp(Ymax, audio_array, times)
-
 # log=10*math.log10(Ymax)
+
+DlaX = np.interp(Ymax, audio_array, times, period=np.inf) # dodanie period=np.inf wystarczyło
+
+
 print('Maksymalna wartość dla (Y) to: '+ str(Ymax))
 
-
 # print(s)
-print('Dla x równego '+ str(DlaX) ) 
+
+print('Dla x równego ' "%.2f" % + DlaX  )         #   "%.2f" % aby zmniejszyć liczbę miejsc po przecinku do dwóch opcjonalnie możesz dodać "%.3f" % dla dokładniejszych wyników
 # print log
 
 
