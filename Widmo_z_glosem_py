@@ -8,6 +8,7 @@ from scipy import signal
 from playsound import playsound
 import multiprocessing
 import threading
+import time 
 
 user_choice = -1
 
@@ -243,8 +244,8 @@ while user_choice != 5:
 
     if user_choice == 3:
         threading.Thread(target=odtworz).start()
-        threading.Thread(target=nag_odt).start()
-        
+        threading.Thread(target=nag_odt).start()               
+        time.sleep(4)
 
     if user_choice == 4:
         pokaz()
