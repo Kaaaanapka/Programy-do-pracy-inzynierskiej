@@ -6,6 +6,8 @@ import math
 from scipy.signal import find_peaks
 from scipy import signal
 from playsound import playsound
+import multiprocessing
+import threading
 
 user_choice = -1
 
@@ -57,7 +59,7 @@ def nagraj():                           #NAGRYWANIE PIERWSZEJ PRÓBKI
     stream.close()
     pa.terminate()
 
-    obj = wave.open('próbka.wav', 'wb')                 #RB READ ONLY WB WRITE ONLY DO NAGRYWANIA ZMIEŃ
+    obj = wave.open('probka.wav', 'wb')                 #RB READ ONLY WB WRITE ONLY DO NAGRYWANIA ZMIEŃ
     obj.setnchannels(CHANNELS)
     obj.setsampwidth(pa.get_sample_size(FORMAT))
     obj.setframerate(RATE)
@@ -68,9 +70,10 @@ def nagraj():                           #NAGRYWANIE PIERWSZEJ PRÓBKI
 
 def odtworz():
 
-    playsound('próbka.wav')
+    playsound('probka.wav')
 
 def nag_odt():                      #ODTWORZENIE PRÓBKI + NAGRANIE Z ODLEGLOSCI NP. 1 METRA
+    
 
 
         FRAMES_PER_BUFFER = 3200
@@ -87,7 +90,7 @@ def nag_odt():                      #ODTWORZENIE PRÓBKI + NAGRANIE Z ODLEGLOSCI
             input=True,
             frames_per_buffer=FRAMES_PER_BUFFER
         )
-
+        
         print('Nagrywanie')
 
         seconds = 3
@@ -95,7 +98,7 @@ def nag_odt():                      #ODTWORZENIE PRÓBKI + NAGRANIE Z ODLEGLOSCI
         second_tracking = 0
         second_count = 0
 
-        
+
 
         for i in range(0, int(RATE/FRAMES_PER_BUFFER*seconds)):
             data = stream.read(FRAMES_PER_BUFFER)
@@ -106,22 +109,31 @@ def nag_odt():                      #ODTWORZENIE PRÓBKI + NAGRANIE Z ODLEGLOSCI
                 second_tracking = 0
                 print(f'Pozostało: {seconds - second_count}' ' sekund')
 
-                
-
         stream.stop_stream()
         stream.close()
         pa.terminate()
 
-        obj = wave.open('próbka.wav', 'rb')
+        obj = wave.open('probka2.wav', 'wb')
         obj.setnchannels(CHANNELS)
         obj.setsampwidth(pa.get_sample_size(FORMAT))
         obj.setframerate(RATE)
         obj.writeframes(b''.join(frames))
         obj.close()
 
+
+
+
+# p1 = multiprocessing.Process(target=odtworz, args=[])
+# p2 = multiprocessing.Process(target=nag_odt, args=[])
+
+
+# if __name__ == '__main__':
+#         p1.start()
+#         p2.start()
+
 def pokaz():
 
-    file = wave.open('próbka.wav', 'rb')
+    file = wave.open('probka.wav', 'rb')
 
     sample_freq = file.getframerate()
     frames = file.getnframes()
@@ -168,18 +180,71 @@ def pokaz():
     # print log
 
 
+
+
+    file = wave.open('probka2.wav', 'rb')
+
+    sample_freq = file.getframerate()
+    frames = file.getnframes()
+    signal_wave = file.readframes(-1)
+
+
+
+    file.close()
+
+
+
+    time = frames / sample_freq
+
+    # z zaleznosci od kanału 1 użyj int16 w 2 użyj int32
+    audio_array = np.frombuffer(signal_wave, dtype=np.int16)
+
+    times1 = np.linspace(0, time, num=frames)
+
+    plt.figure(figsize=(15, 5))
+    plt.plot(times1, audio_array)
+    plt.ylabel('Fala dźwieku')
+    plt.xlabel('Czas (w s)')
+    plt.xlim(0, time)
+    plt.title('Próbka którą nagrałem')
+
+    # ymin, ymax = plt.ylim()
+
+
+    #Narazie wyszukuje Ymin i Ymax
+    # s = 'Maksymalne (Y) wystąpiło dla wartości = ' + str(ymax) + '\n' + \
+    #    'Minimalne (Y) wystąpiło dla wartości =  ' + str(ymin) + ' '
+
+    Ymax=np.max(audio_array)
+    # log=10*math.log10(Ymax)
+
+    DlaX = np.interp(Ymax, audio_array, times, period=np.inf) # dodanie period=np.inf wystarczyło
+
+
+    print('Maksymalna wartość dla (Y) to: '+ str(Ymax))
+
+    # print(s)
+
+    print('Dla x równego ' "%.2f" % + DlaX + ' s' )         #   "%.2f" % aby zmniejszyć liczbę miejsc po przecinku do dwóch opcjonalnie możesz dodać "%.3f" % dla dokładniejszych wyników
+    # print log
+
     plt.show()
+    plt.show()
+
+
 
 
 while user_choice != 5:
     if user_choice == 1:
         nagraj()
 
-    if user_choice ==2:
+    if user_choice ==2:    
         odtworz()
 
     if user_choice == 3:
-        nag_odt()
+        threading.Thread(target=odtworz).start()
+        threading.Thread(target=nag_odt).start()
+        
 
     if user_choice == 4:
         pokaz()
@@ -194,3 +259,6 @@ while user_choice != 5:
 
     user_choice = int(input("Wybierz liczbę: "))
     print()
+
+
+    
