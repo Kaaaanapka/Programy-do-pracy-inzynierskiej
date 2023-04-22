@@ -121,17 +121,6 @@ def nag_odt():                      #ODTWORZENIE PRÓBKI + NAGRANIE Z ODLEGLOSCI
         obj.writeframes(b''.join(frames))
         obj.close()
 
-
-
-
-# p1 = multiprocessing.Process(target=odtworz, args=[])
-# p2 = multiprocessing.Process(target=nag_odt, args=[])
-
-
-# if __name__ == '__main__':
-#         p1.start()
-#         p2.start()
-
 def pokaz():
 
     file = wave.open('probka.wav', 'rb')
@@ -160,24 +149,17 @@ def pokaz():
     plt.xlim(0, time)
     plt.title('Próbka którą nagrałem')
 
-    # ymin, ymax = plt.ylim()
-
-
-    #Narazie wyszukuje Ymin i Ymax
-    # s = 'Maksymalne (Y) wystąpiło dla wartości = ' + str(ymax) + '\n' + \
-    #    'Minimalne (Y) wystąpiło dla wartości =  ' + str(ymin) + ' '
-
-    Ymax=np.max(audio_array)
+    Ymax1=np.max(audio_array)
     # log=10*math.log10(Ymax)
 
-    DlaX = np.interp(Ymax, audio_array, times, period=np.inf) # dodanie period=np.inf wystarczyło
+    DlaX1 = np.interp(Ymax1, audio_array, times, period=np.inf) # dodanie period=np.inf wystarczyło
 
 
-    print('Maksymalna wartość dla (Y) to: '+ str(Ymax))
+    print('Maksymalna wartość dla (Y) to: '+ str(Ymax1))
 
     # print(s)
 
-    print('Dla x równego ' "%.2f" % + DlaX + ' s' )         #   "%.2f" % aby zmniejszyć liczbę miejsc po przecinku do dwóch opcjonalnie możesz dodać "%.3f" % dla dokładniejszych wyników
+    print('Dla x równego ' "%.4f" % + DlaX1 + ' s' ) # "%.2f" % aby zmniejszyć liczbę miejsc po przecinku do dwóch opcjonalnie możesz dodać "%.3f" % dla dokładniejszych wyników
     # print log
 
 
@@ -209,13 +191,6 @@ def pokaz():
     plt.xlim(0, time)
     plt.title('Próbka którą nagrałem')
 
-    # ymin, ymax = plt.ylim()
-
-
-    #Narazie wyszukuje Ymin i Ymax
-    # s = 'Maksymalne (Y) wystąpiło dla wartości = ' + str(ymax) + '\n' + \
-    #    'Minimalne (Y) wystąpiło dla wartości =  ' + str(ymin) + ' '
-
     Ymax=np.max(audio_array)
     # log=10*math.log10(Ymax)
 
@@ -226,8 +201,16 @@ def pokaz():
 
     # print(s)
 
-    print('Dla x równego ' "%.2f" % + DlaX + ' s' )         #   "%.2f" % aby zmniejszyć liczbę miejsc po przecinku do dwóch opcjonalnie możesz dodać "%.3f" % dla dokładniejszych wyników
+    print('Dla x równego ' "%.4f" % + DlaX + ' s' ) # "%.2f" % aby zmniejszyć liczbę miejsc po przecinku do dwóch opcjonalnie możesz dodać "%.3f" % dla dokładniejszych wyników
     # print log
+
+
+    Roznica = DlaX - DlaX1
+    if (Roznica < 0 ):
+    
+        Roznica = Roznica*-1
+    
+    print('Różnica dla maksymalny amplitud w sekundach wynosi ' "%.4f" % + (Roznica) + ' s')
 
     plt.show()
     plt.show()
@@ -243,8 +226,9 @@ while user_choice != 5:
         odtworz()
 
     if user_choice == 3:
+        threading.Thread(target=nag_odt).start()   
         threading.Thread(target=odtworz).start()
-        threading.Thread(target=nag_odt).start()               
+
         time.sleep(4)
 
     if user_choice == 4:
