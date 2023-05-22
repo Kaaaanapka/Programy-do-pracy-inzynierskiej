@@ -1,0 +1,69 @@
+import numpy as np
+import sounddevice as sd
+from scipy.fftpack import fft
+import matplotlib.pyplot as plt
+
+def generate_signal(frequency, duration, sampling_rate):
+    t = np.linspace(0, duration, int(duration * sampling_rate), endpoint=False)
+    signal = np.sin(2 * np.pi * frequency * t)
+    return signal
+
+def record_audio(duration, sampling_rate):
+    recording = sd.rec(int(duration * sampling_rate), samplerate=sampling_rate, channels=1, blocking=True)
+    return recording.flatten()
+
+def perform_fft(signal):
+    fft_result = fft(signal)
+    return np.abs(fft_result)
+
+def calculate_amplitude_ratio(input_signal, output_signal):
+    return np.divide(output_signal, input_signal)
+
+def main():
+    # Parametry sygnału
+    start_frequency = 100  # Początkowa częstotliwość
+    end_frequency = 20000  # Końcowa częstotliwość
+    frequency_step = 500  # Krok częstotliwości
+    duration = 1.0
+    sampling_rate = 44100
+
+    frequencies = list(range(start_frequency, end_frequency + 1, frequency_step))
+
+    # Inicjalizacja list do przechowywania danych
+    fft_inputs = []
+    fft_outputs = []
+
+    for frequency in frequencies:
+        # Generowanie sygnału
+        signal = generate_signal(frequency, duration, sampling_rate)
+
+        # Nagrywanie dźwięku z mikrofonu
+        recorded_signal = record_audio(duration, sampling_rate)
+
+        # Obliczanie FFT
+        fft_input = perform_fft(signal)
+        fft_output = perform_fft(recorded_signal)
+
+        # Dodawanie danych do list
+        fft_inputs.append(fft_input)
+        fft_outputs.append(fft_output)
+
+    # Wyświetlanie wykresów
+    fig, axs = plt.subplots(2, 2, figsize=(12, 8))
+
+    for i, frequency in enumerate(frequencies):
+        row = i // 2
+        col = i % 2
+
+        axs[row, col].plot(np.abs(fft_inputs[i][:len(fft_inputs[i]) // 2]), label="Theoretical")
+        axs[row, col].plot(np.abs(fft_outputs[i][:len(fft_outputs[i]) // 2]), label="Recorded")
+        axs[row, col].set_title(f"FFT - {frequency} Hz")
+        axs[row, col].set_xlabel("Frequency (Hz)")
+        axs[row, col].set_ylabel("Amplitude")
+        axs[row, col].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    main()
