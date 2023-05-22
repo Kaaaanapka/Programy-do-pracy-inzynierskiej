@@ -5,13 +5,19 @@ from impedance.visualization import plot_nyquist
 
 #wczytywanie danych z przykładu danych EIS
 
-freq, Z = preprocessing.readCSV('exampleData.csv')
+freq, Z = preprocessing.readCSV('impedancja3.csv') # probka_Output_mono.csv, exampledata.csv, impedacja_rc.csv
 
 # zachowanie danych impedancji w pierwszym kwadrancie
 freq, Z = preprocessing.ignoreBelowX(freq, Z)
 
-obwod = 'R0-p(R1,C1)-p(R2-Wo1, C2)'
-initial_guess = [.01, .01, 100, .01, .05, 100, 1]
+#obwod = 'R0-p(R1,C1)-p(R2-Wo1, C2)'
+#initial_guess = [.01, .01, 100, .01, .05, 100, 1]
+
+obwod = 'p(R0,C1)'
+initial_guess = [1, 0.1]
+
+#obwod = 'p(R0,C1)-p(R1,C2)'                    #Dla szeregowego obwodu RCC
+#initial_guess = [1, 0.1, 1, 0.1]
 
 obwod = CustomCircuit(obwod, initial_guess=initial_guess)
 obwod.fit(freq, Z)
